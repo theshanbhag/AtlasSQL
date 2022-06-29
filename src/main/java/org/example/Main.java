@@ -12,39 +12,42 @@ import java.util.Map;
 
 
 public class Main {
-    static final String JDBC_DRIVER = "com.mongodb.jdbc.MongoDriver";
-    static final String URL = "jdbc:mongodb://federateddatabaseinstance1-2wqno.a.query.mongodb.net/?ssl=true&authSource=admin";
-
+    static final String URL = "jdbc:mongodb://federateddatabaseinstance0-2wqno.a.query.mongodb.net/?ssl=true&authSource=admin";
     public static void main(String[] args) throws SQLException {
 
-        /** BigQuery settings **/
-        String datasetName = "mflix";
-        String tableName = "Users-02";
+        /** BigQuery parameters **/
+        String datasetName = args[0];
+        String tableName = args[1];
+
+        /** MongoDB parameters **/
+        String mdbUser = args[2];
+        String mdbPass = args[3];
+        String datalakeDBName = args[4];
+        String collection = args[5];
+        String  deapth = args[6];
 
         BigQuery bigquery = BigQueryOptions.getDefaultInstance().getService();
         TableId tableId = TableId.of(datasetName, tableName);
 
-
-
         /** MongoDB settings **/
-        java.util.Properties p = setProperties();
+        java.util.Properties p = setProperties(mdbUser, mdbPass, datalakeDBName);
         System.out.println("Connecting to database test...");
         Connection conn = DriverManager.getConnection(URL, p);
 
         /** Execute SQL query on Mongodb **/
         System.out.println("Creating statement...");
         Statement stmt = conn.createStatement();
-        ResultSet resultSet = stmt.executeQuery("SELECT * from movies");
+        String query = "SELECT * from FLATTEN("+datalakeDBName+"."+collection+" WITH DEPTH =>"+ deapth +")";
+        System.out.println(">>>>>>>>>>>>>>"+ query);
+        ResultSet resultSet = stmt.executeQuery(query);
+
+        conn.close();
 
         ResultSetMetaData rsmd = resultSet.getMetaData();
         System.out.println("++++++ Showing contents for mydb.Users ++++++++");
-        System.out.println("rs >>>>>>>>>>>>>"+resultSet);
         int columnsNumber = rsmd.getColumnCount();
-        System.out.println(">>>>>>>>>>>>>"+columnsNumber);
-
 
         /** Bigquery Create Schema **/
-
         final List<Field> fields = createSchema(rsmd, columnsNumber);
         Schema schema = Schema.of(fields);
         TableDefinition tableDefinition = StandardTableDefinition.of(schema);
@@ -55,8 +58,8 @@ public class Main {
         }catch (BigQueryException e) {
             System.out.println("Table was not created. \n" + e.toString());
         }
-
-
+//
+//
         System.out.println("Table created successfully");
 
         while(resultSet.next()){
@@ -65,9 +68,6 @@ public class Main {
             InsertAllResponse response =
                     bigquery.insertAll(
                             InsertAllRequest.newBuilder(tableId)
-                                    // More rows can be added in the same RPC by invoking .addRow() on the builder.
-                                    // You can also supply optional unique row keys to support de-duplication
-                                    // scenarios.
                                     .addRow(rowContent)
                                     .build());
             if (response.hasErrors()) {
@@ -76,11 +76,13 @@ public class Main {
                     System.out.println("Response error: \n" + entry.getValue());
                 }
             }
-
-//                String name = resultSet.getString("name");
-//                System.out.println("metadata>>>>>>> "+name);
         }
     }
+
+
+
+
+
     public static List<Field> createSchema(ResultSetMetaData rsmd, int columnsNumber ) throws SQLException {
         final List<Field> fields = new ArrayList<>();
         for(int i=1; i<= columnsNumber; i++) {
@@ -99,7 +101,6 @@ public class Main {
         }
         return fields;
     }
-
     public static Map<String, Object> createRowContent(ResultSetMetaData rsmd, int columnsNumber, ResultSet resultSet) throws SQLException {
         Map<String, Object> rowContent = new HashMap<>();
 
@@ -134,14 +135,13 @@ public class Main {
         }
         return rowContent;
     }
-
-    public static java.util.Properties setProperties(){
+    public static java.util.Properties setProperties(String mdbUser, String mdbPass, String db_name){
         java.util.Properties property = new java.util.Properties();
         // These properties will be added to the URI.
         // Uncomment if you wish to specify user and password.
-        property.setProperty("user", "venkatesh");
-        property.setProperty("password", "ashwin123");
-        property.setProperty("database", "mflix");
+        property.setProperty("user", mdbUser);
+        property.setProperty("password", mdbPass);
+        property.setProperty("database", db_name);
         return property;
     }
 
