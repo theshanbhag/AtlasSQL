@@ -41,6 +41,11 @@
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-bigquery</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>4.0</version>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
