@@ -9,3 +9,16 @@ MongoDB Atlas and Bigquery complement each other, with Mongodb handling real tim
 Accessing MongoDB data requires knowledge of MQL and formatting the JSON data. To simplify the user who has expertise in SQL development MongoDB Atlas SQL comes to rescue. Atlas SQL helps to run SQL query on MongoDB database.
 
 ![img.png](img.png)
+
+
+
+### Build the package
+```
+mvn clean compile
+```
+
+### Run the package
+```
+mvn exec:java -Dexec:mainClass=org.example.BigqueryAPI -Dexec.args="<bq_dataset> <bq_table> <mdb_user> <mdb_pass> <Atlas_datalake_name> <collection_name> <deapth>" -X
+```
+
