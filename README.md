@@ -19,6 +19,6 @@ mvn clean compile
 
 ### Run the package
 ```
-mvn exec:java -Dexec:mainClass=org.example.BigqueryAPI -Dexec.args="<bq_dataset> <bq_table> <mdb_user> <mdb_pass> <Atlas_datalake_name> <collection_name> <deapth>" -X
+mvn exec:java -Dexec:mainClass=org.example.Utils -Dexec.args="<bq_dataset> <bq_table> <mdb_user> <mdb_pass> <Atlas_datalake_name> <collection_name> <deapth>" -X
 ```
 
