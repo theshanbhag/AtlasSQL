@@ -1,9 +1,7 @@
 package org.example;
 
-
 import com.google.cloud.bigquery.Field;
 import com.google.cloud.bigquery.StandardSQLTypeName;
-
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -13,73 +11,70 @@ import java.util.List;
 import java.util.Map;
 
 public class Utils {
-    public static java.util.Properties setProperties(String mdbUser, String mdbPass, String db_name){
-        java.util.Properties property = new java.util.Properties();
-        // These properties will be added to the URI.
-        // Uncomment if you wish to specify user and password.
-        property.setProperty("user", mdbUser);
-        property.setProperty("password", mdbPass);
-        property.setProperty("database", db_name);
-        return property;
+  public static java.util.Properties setProperties(String mdbUser, String mdbPass, String db_name) {
+    java.util.Properties property = new java.util.Properties();
+    // These properties will be added to the URI.
+    // Uncomment if you wish to specify user and password.
+    property.setProperty("user", mdbUser);
+    property.setProperty("password", mdbPass);
+    property.setProperty("database", db_name);
+    return property;
+  }
+
+  public static List<Field> createSchema(ResultSetMetaData rsmd, int columnsNumber)
+      throws SQLException {
+    final List<Field> fields = new ArrayList<>();
+    for (int i = 1; i <= columnsNumber; i++) {
+      String dataType = rsmd.getColumnTypeName(i);
+      if (dataType == "string") {
+        fields.add(Field.of(rsmd.getColumnName(i), StandardSQLTypeName.STRING));
+      } else if (dataType == "int") {
+        fields.add(Field.of(rsmd.getColumnName(i), StandardSQLTypeName.INT64));
+      } else if (dataType == "double" || dataType == "float") {
+        fields.add(Field.of(rsmd.getColumnName(i), StandardSQLTypeName.FLOAT64));
+      } else if (dataType == "object") {
+        fields.add(Field.of(rsmd.getColumnName(i), StandardSQLTypeName.STRING));
+      } else {
+        fields.add(Field.of(rsmd.getColumnName(i), StandardSQLTypeName.STRING));
+      }
     }
+    return fields;
+  }
 
-    public static List<Field> createSchema(ResultSetMetaData rsmd, int columnsNumber ) throws SQLException {
-        final List<Field> fields = new ArrayList<>();
-        for(int i=1; i<= columnsNumber; i++) {
-            String dataType = rsmd.getColumnTypeName(i);
-            if (dataType == "string") {
-                fields.add(Field.of(rsmd.getColumnName(i), StandardSQLTypeName.STRING));
-            } else if (dataType == "int") {
-                fields.add(Field.of(rsmd.getColumnName(i), StandardSQLTypeName.INT64));
-            } else if (dataType == "double" || dataType == "float") {
-                fields.add(Field.of(rsmd.getColumnName(i), StandardSQLTypeName.FLOAT64));
-            } else if (dataType == "object") {
-                fields.add(Field.of(rsmd.getColumnName(i), StandardSQLTypeName.STRING));
-            } else {
-                fields.add(Field.of(rsmd.getColumnName(i), StandardSQLTypeName.STRING));
-            }
-        }
-        return fields;
+  public static Map<String, Object> createRowContent(
+      ResultSetMetaData rsmd, int columnsNumber, ResultSet resultSet) throws SQLException {
+    Map<String, Object> rowContent = new HashMap<>();
+
+    for (int i = 1; i <= columnsNumber; i++) {
+      String dataType = rsmd.getColumnTypeName(i);
+
+      if (dataType == "string") {
+        String columnValue = resultSet.getString(i);
+        rowContent.put(rsmd.getColumnName(i), columnValue);
+      } else if (dataType == "int") {
+        Integer columnValue = resultSet.getInt(i);
+        rowContent.put(rsmd.getColumnName(i), columnValue);
+      } else if (dataType == "objectId") {
+        String columnValue = resultSet.getObject(i).toString();
+        rowContent.put(rsmd.getColumnName(i), columnValue);
+      } else if (dataType == "object") {
+        String columnValue = resultSet.getString(i);
+        rowContent.put(rsmd.getColumnName(i), columnValue);
+      } else if (dataType == "double") {
+        Double columnValue = resultSet.getDouble(i);
+        rowContent.put(rsmd.getColumnName(i), columnValue);
+      } else {
+        String columnValue = resultSet.getString(i);
+        rowContent.put(rsmd.getColumnName(i), columnValue);
+      }
     }
-
-    public static Map<String, Object> createRowContent(ResultSetMetaData rsmd, int columnsNumber, ResultSet resultSet) throws SQLException {
-        Map<String, Object> rowContent = new HashMap<>();
-
-        for (int i = 1; i <= columnsNumber; i++) {
-            String dataType = rsmd.getColumnTypeName(i);
-
-            if(dataType == "string") {
-                String columnValue = resultSet.getString(i);
-                rowContent.put(rsmd.getColumnName(i), columnValue);
-            }
-            else if(dataType == "int") {
-                Integer columnValue = resultSet.getInt(i);
-                rowContent.put(rsmd.getColumnName(i), columnValue);
-            }
-            else if(dataType == "objectId") {
-                String columnValue = resultSet.getObject(i).toString();
-                rowContent.put(rsmd.getColumnName(i), columnValue);
-            }
-            else if(dataType == "object") {
-                String columnValue = resultSet.getString(i);
-                rowContent.put(rsmd.getColumnName(i), columnValue);
-            }
-            else if(dataType == "double") {
-                Double columnValue = resultSet.getDouble(i);
-                rowContent.put(rsmd.getColumnName(i), columnValue);
-            }
-            else {
-                String columnValue = resultSet.getString(i);
-                rowContent.put(rsmd.getColumnName(i), columnValue);
-            }
-        }
-        return rowContent;
-    }
+    return rowContent;
+  }
 }
 
-
-//public class MongoDbUtils {
-//    static final String URL = "jdbc:mongodb://federateddatabaseinstance1-2wqno.a.query.mongodb.net/?ssl=true&authSource=admin";
+// public class MongoDbUtils {
+//    static final String URL =
+// "jdbc:mongodb://federateddatabaseinstance1-2wqno.a.query.mongodb.net/?ssl=true&authSource=admin";
 //    private static final String SAMPLE_CSV_FILE_PATH = "./mdb-table-data/users.csv";
 //    public static void main(String[] args) throws SQLException, IOException {
 //
@@ -131,7 +126,8 @@ public class Utils {
 ////                                    .build());
 ////            if (response.hasErrors()) {
 ////                // If any of the insertions failed, this lets you inspect the errors
-////                for (Map.Entry<Long, List<BigQueryError>> entry : response.getInsertErrors().entrySet()) {
+////                for (Map.Entry<Long, List<BigQueryError>> entry :
+// response.getInsertErrors().entrySet()) {
 ////                    System.out.println("Response error: \n" + entry.getValue());
 ////                }
 ////            }
@@ -151,7 +147,8 @@ public class Utils {
 //
 //
 //
-//    public static List<Field> createSchema(ResultSetMetaData rsmd, int columnsNumber ) throws SQLException {
+//    public static List<Field> createSchema(ResultSetMetaData rsmd, int columnsNumber ) throws
+// SQLException {
 //        final List<Field> fields = new ArrayList<>();
 //        for(int i=1; i<= columnsNumber; i++) {
 //            String dataType = rsmd.getColumnTypeName(i);
@@ -169,7 +166,8 @@ public class Utils {
 //        }
 //        return fields;
 //    }
-//    public static Map<String, Object> createRowContent(ResultSetMetaData rsmd, int columnsNumber, ResultSet resultSet) throws SQLException {
+//    public static Map<String, Object> createRowContent(ResultSetMetaData rsmd, int columnsNumber,
+// ResultSet resultSet) throws SQLException {
 //        Map<String, Object> rowContent = new HashMap<>();
 //
 //        for (int i = 1; i <= columnsNumber; i++) {
@@ -213,4 +211,4 @@ public class Utils {
 //        return property;
 //    }
 //
-//}
+// }
