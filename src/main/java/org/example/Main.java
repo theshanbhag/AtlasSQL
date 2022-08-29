@@ -40,8 +40,6 @@ public class Main {
         String query = "SELECT * from FLATTEN("+datalakeDBName+"."+collection+" WITH DEPTH =>"+ deapth +")";
         ResultSet resultSet = stmt.executeQuery(query);
 
-        conn.close();
-
         ResultSetMetaData rsmd = resultSet.getMetaData();
         int columnsNumber = rsmd.getColumnCount();
 
@@ -75,5 +73,6 @@ public class Main {
                 }
             }
         }
+        conn.close();
     }
 }
