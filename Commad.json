@@ -1,0 +1,234 @@
+{
+  validator : { $jsonSchema :
+  {
+    bsonType : "object",
+    properties :
+    {
+      _id: { bsonType: "objectId" },
+      Name : { bsonType: "string"},
+      Address: {
+        bsonType: "object",
+        properties : {
+          phone: { bsonType: "int" },
+          Town :{bsonType: "string"}
+        },
+        additionalProperties: false
+      },
+      bill_amount: {bsonType: "int"}
+    },additionalProperties: false}
+  }
+}
+
+db.createCollection("customer",{
+validator : { $jsonSchema :
+{
+bsonType : "object",
+properties :
+{
+_id: { bsonType: "objectId" },
+activity : { bsonType: "string"},
+gps_coordinates: {
+bsonType: "array",
+"items": {
+"bsonType": "double"
+},
+additionalProperties: false
+},
+internal_activity: {bsonType: "string"},
+location: {bsonType: "string"},
+time: {bsonType: "date"},
+"tracking_number": {bsonType: "string"},
+},additionalProperties: false}
+}
+});
+
+
+
+db.runCommand(
+{
+sqlSetSchema:"ups",
+schema: { "version": 1,
+"jsonSchema": {
+bsonType : "object",
+properties :
+{
+_id: { bsonType: "objectId" },
+activity : { bsonType: "string"},
+gps_coordinates: {
+bsonType: "array",
+"items": {
+"bsonType": "double"
+},
+additionalProperties: false
+},
+internal_activity: {bsonType: "string"},
+location: {bsonType: "string"},
+time: {bsonType: "date"},
+"tracking_number": {bsonType: "string"}
+},additionalProperties: false}}
+});
+
+
+
+
+
+
+
+db.runCommand(
+{
+sqlSetSchema: "customers",
+schema:{
+"version": 1,
+"jsonSchema": {
+bsonType : "object",
+properties :{
+"_id": {"bsonType": "objectId"},
+"address": {
+"bsonType": "object",
+"properties": {
+"city": {"bsonType": "string"},
+"location": {"bsonType": "object",
+"properties": {
+"coordinates": {"bsonType": "array", "items": {"bsonType": "double"}, additionalProperties: false},
+"type": {"bsonType": "string"}
+},
+additionalProperties: false
+},
+"number": {"bsonType": "int"},
+"state": {"bsonType": "string"},
+"street": {"bsonType": "string"},
+"zip": {"bsonType": "string"}
+},
+additionalProperties: false
+},
+"cell": {"bsonType": "long"},
+"email": {"bsonType": "string"},
+"firstname": {"bsonType": "string"},
+"gender": {"bsonType": "string"},
+"lastname": {"bsonType": "string"},
+"policies": {"bsonType": "array",
+"items": {
+"bsonType": "object",
+"properties": {
+"address": {
+"bsonType": "object",
+"properties": {
+"city": {"bsonType": "string"},
+"location": {
+"bsonType": "object",
+"properties": {"coordinates": {"bsonType": "array", "items": {"bsonType": "double"}, additionalProperties: false},
+"type": {"bsonType": "string"}
+},
+additionalProperties: false
+},
+"number": {"bsonType": "int"},
+"state": {"bsonType": "string"},
+"street": {"bsonType": "string"},
+"zip": {"bsonType": "string"}
+}
+},
+"insured_person": {
+"bsonType": "object",
+"properties": {
+"firstname": {"bsonType": "string"},
+"lastname": {"bsonType": "string"},
+"smoking": {"bsonType": "bool"},
+"yob": {"bsonType": "date"}
+},
+additionalProperties: false
+},
+"model": {"bsonType": "string"},
+"nextRenewalDt": {"bsonType": "date"},
+"policyNum": {"bsonType": "string"},
+"policyType": {"bsonType": "string"},
+"value": {"bsonType": "int"},
+"year": {"bsonType": "int"}
+}
+}
+},
+"region": {"bsonType": "int"},
+"yob": {"bsonType": "date"}
+},
+additionalProperties: false
+}
+}
+});
+
+
+{
+"title": "customer",
+"properties": {
+"_id": {"bsonType": "objectId"},
+"address": {
+"bsonType": "object",
+"properties": {
+"city": {"bsonType": "string"},
+"location": {"bsonType": "object",
+"properties": {
+"coordinates": {"bsonType": "array", "items": {"bsonType": "double"}},
+"type": {"bsonType": "string"}
+}
+},
+"number": {"bsonType": "int"},
+"state": {"bsonType": "string"},
+"street": {"bsonType": "string"},
+"zip": {"bsonType": "string"}
+}
+},
+"cell": {"bsonType": "long"},
+"email": {"bsonType": "string"},
+"firstname": {"bsonType": "string"},
+"gender": {"bsonType": "string"},
+"lastname": {"bsonType": "string"},
+"policies": {"bsonType": "array",
+"items": {
+"bsonType": "object",
+"properties": {
+"address": {
+"bsonType": "object",
+"properties": {
+"city": {"bsonType": "string"},
+"location": {
+"bsonType": "object",
+"properties": {"coordinates": {"bsonType": "array", "items": {"bsonType": "double"}},
+"type": {"bsonType": "string"}
+}
+},
+"number": {"bsonType": "int"},
+"state": {"bsonType": "string"},
+"street": {"bsonType": "string"},
+"zip": {"bsonType": "string"}
+}
+},
+"insured_person": {
+"bsonType": "object",
+"properties": {
+"firstname": {"bsonType": "string"},
+"lastname": {"bsonType": "string"},
+"smoking": {"bsonType": "bool"},
+"yob": {"bsonType": "date"}
+}
+},
+"model": {"bsonType": "string"},
+"nextRenewalDt": {"bsonType": "date"},
+"policyNum": {"bsonType": "string"},
+"policyType": {"bsonType": "string"},
+"value": {"bsonType": "int"},
+"year": {"bsonType": "int"}
+}
+}
+},
+"region": {"bsonType": "int"},
+"yob": {"bsonType": "date"}
+}
+}
+
+db.runCommand(
+{ sqlSetSchema : "egData",
+"schema" : {
+"version" : NumberLong(1),
+"jsonSchema" : {
+"bsonType" : [ "object" ],
+"properties" : {
+"a" : { "bsonType" : [ "object" ], "properties" : { "b" : { "bsonType" : [ "object", "array" ], "properties" : { "c" : { "bsonType" : [ "array", "string", "object", "null" ], "properties" : { "d" : { "bsonType" : [ "int" ] } }, "items" : { "bsonType" : [ "int" ] } } }, "items" : { "bsonType" : [ "int" ] } } } }, "s" : { "bsonType" : [ "int", "object" ], "properties" : { "b" : { "bsonType" : [ "object" ], "properties" : { "c" : { "bsonType" : [ "object" ], "properties" : { "d" : { "bsonType" : [ "array" ], "items" : { "bsonType" : [ "string" ] } } } } } } } } } } }})
+

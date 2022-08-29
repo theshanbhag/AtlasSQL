@@ -21,4 +21,3 @@ mvn clean compile
 ```
 mvn exec:java -Dexec:mainClass=org.example.Utils -Dexec.args="<bq_dataset> <bq_table> <mdb_user> <mdb_pass> <Atlas_datalake_name> <collection_name> <deapth>" -X
 ```
-
