@@ -44,7 +44,7 @@ public class Main {
             + ")";
     ResultSet resultSet = stmt.executeQuery(query);
 
-    conn.close();
+//    conn.close();
 
     ResultSetMetaData rsmd = resultSet.getMetaData();
     int columnsNumber = rsmd.getColumnCount();
@@ -76,5 +76,6 @@ public class Main {
         }
       }
     }
+    conn.close();
   }
 }
