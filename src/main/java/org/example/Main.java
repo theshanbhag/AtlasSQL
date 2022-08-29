@@ -12,22 +12,23 @@ public class Main {
 
   public static void main(String[] args) throws SQLException {
 
-    /** BigQuery parameters. * */
-    String datasetName = args[0];
-    String tableName = args[1];
-
-    /** MongoDB parameters. * */
-    String mdbUser = args[2];
-    String mdbPass = args[3];
-    String datalakeDBName = args[4];
-    String collection = args[5];
-    String deapth = args[6];
+//    /** BigQuery parameters. * */
+//    String datasetName = args[0];
+//    String tableName = args[1];
+//
+//    /** MongoDB parameters. * */
+//    String mdbUser = args[2];
+//    String mdbPass = args[3];
+//    String datalakeDBName = args[4];
+//    String collection = args[5];
+//    String deapth = args[6];
 
     BigQuery bigquery = BigQueryOptions.getDefaultInstance().getService();
-    TableId tableId = TableId.of(datasetName, tableName);
+    TableId tableId = TableId.of("mflix", "atlassql01");
 
+    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>"+ tableId);
     /** MongoDB settings. * */
-    java.util.Properties p = Utils.setProperties(mdbUser, mdbPass, datalakeDBName);
+    java.util.Properties p = Utils.setProperties("venkatesh", "ashwin123", "MyFirstDatabase");
     System.out.println("Connecting to database test...");
     Connection conn = DriverManager.getConnection(URL, p);
 
@@ -36,15 +37,14 @@ public class Main {
     Statement stmt = conn.createStatement();
     String query =
         "SELECT * from FLATTEN("
-            + datalakeDBName
+            + "MyFirstDatabase"
             + "."
-            + collection
+            + "customers"
             + " WITH DEPTH =>"
-            + deapth
+            + "1"
             + ")";
     ResultSet resultSet = stmt.executeQuery(query);
-
-//    conn.close();
+    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+resultSet);
 
     ResultSetMetaData rsmd = resultSet.getMetaData();
     int columnsNumber = rsmd.getColumnCount();
@@ -57,25 +57,31 @@ public class Main {
 
     try {
       bigquery.create(tableInfo);
+      System.out.println("Table created successfully");
     } catch (BigQueryException e) {
       System.out.println("Table was not created. \n" + e.toString());
     }
     //
-    //
-    System.out.println("Table created successfully");
+    System.out.println("?>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> here");
 
-    while (resultSet.next()) {
-      // Retrieve by column name
-      Map<String, Object> rowContent = Utils.createRowContent(rsmd, columnsNumber, resultSet);
-      InsertAllResponse response =
-          bigquery.insertAll(InsertAllRequest.newBuilder(tableId).addRow(rowContent).build());
-      if (response.hasErrors()) {
-        // If any of the insertions failed, this lets you inspect the errors
-        for (Map.Entry<Long, List<BigQueryError>> entry : response.getInsertErrors().entrySet()) {
-          System.out.println("Response error: \n" + entry.getValue());
+    try{
+      while (resultSet.next()) {
+        // Retrieve by column name
+        Map<String, Object> rowContent = Utils.createRowContent(rsmd, columnsNumber, resultSet);
+        InsertAllResponse response =
+                bigquery.insertAll(InsertAllRequest.newBuilder(tableId).addRow(rowContent).build());
+        if (response.hasErrors()) {
+          // If any of the insertions failed, this lets you inspect the errors
+          for (Map.Entry<Long, List<BigQueryError>> entry : response.getInsertErrors().entrySet()) {
+            System.out.println("Response error: \n" + entry.getValue());
+          }
         }
       }
     }
+    catch (Exception e){
+      System.out.println("Exception: " + e.toString());
+    }
+
     conn.close();
   }
 }
